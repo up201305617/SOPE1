@@ -7,6 +7,8 @@
 #include <sys/wait.h>
 #include <string.h>
 
+#define MAX_LENGTH 255;
+
 int main1(int argc, char* argv[])
 {
   DIR *dir;
@@ -37,16 +39,17 @@ int main1(int argc, char* argv[])
         perror("lstat");
         exit(3);
      }
-     if(S_ISDIR(stat_buf.st_mode) && strcmp(direntp->d_name,"..")!=0 && strcmp(direntp->d_name,".")!=0)
+     //verifica se é um directório e se não é o directório corrente(.) ou o pai do directório corrente(..)
+     if(S_ISDIR(stat_buf.st_mode) && strcmp(direntp->d_name,".")!=0 && strcmp(direntp->d_name,"..")!=0)
      {
         //pid_t pid=fork();
+    	 // pids[child_counter]=pid;
        // if(pid==0)
        // /{
           num_dir++;
           printf("%s\n",direntp->d_name);
         //}
         //child_counter++;
-       // pids[child_counter]=pid;
      }
 
   }
