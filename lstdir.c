@@ -46,11 +46,13 @@ int main(int argc, char* argv[])
 		owner=0;
 		group=0;
 		other=0;
+
 		if (lstat(direntp->d_name, &stat_buf)==-1)
 	    {
 	       perror("lstat");
-	       exit(3);
+	       exit(4);
 	    }
+
 	    if(S_ISREG(stat_buf.st_mode))
 	    {
 	    	//ownwer
@@ -99,7 +101,7 @@ int main(int argc, char* argv[])
 	return 0;
 }
 /*
- printf( (fileStat.st_mode & S_IRUSR) ? "r" : "-");
+ 	printf( (fileStat.st_mode & S_IRUSR) ? "r" : "-");
     printf( (fileStat.st_mode & S_IWUSR) ? "w" : "-");
     printf( (fileStat.st_mode & S_IXUSR) ? "x" : "-");
 
@@ -110,4 +112,5 @@ int main(int argc, char* argv[])
     printf( (fileStat.st_mode & S_IROTH) ? "r" : "-");
     printf( (fileStat.st_mode & S_IWOTH) ? "w" : "-");
     printf( (fileStat.st_mode & S_IXOTH) ? "x" : "-");
+
  */
