@@ -39,6 +39,8 @@ int main(int argc, char* argv[])
 	perror(filename);
 	exit(3);
   }
+  char str[15];
+  sprintf(str, "%d", fd1);
 
   char cwd[PATH_MAX + 1];
   if (getcwd(cwd, PATH_MAX + 1) == NULL)
@@ -71,7 +73,7 @@ int main(int argc, char* argv[])
         if(pid==0)
         {
         	chdir(direntp->d_name);
-        	execl(path,"lstdir",fd1,NULL);
+        	execl(path,"lstdir",str,NULL);
         	exit(5);
         }
         child_counter++;

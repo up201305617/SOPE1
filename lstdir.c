@@ -26,8 +26,6 @@ int main(int argc, char* argv[])
 	char buff[PATH_MAX + 1];
 	cwd = getcwd( buff, PATH_MAX + 1 );
 
-	printf("Hello\n");
-
 	if(argc!=2)
 	{
 		fprintf(stderr, "Usage: %s <file descriptor>\n", argv[0]);
@@ -39,7 +37,7 @@ int main(int argc, char* argv[])
 	    perror(argv[1]);
 	    exit(2);
 	}
-	printf("ENTROU\n");
+
 	dup2(fd1, STDOUT_FILENO);
 
 	while ((direntp = readdir(dir)) != NULL)
@@ -100,8 +98,14 @@ int main(int argc, char* argv[])
 			int day=aux->tm_mday;
 			int month=aux->tm_mon+1;
 			int year=aux->tm_year+1900;
-
-			printf("%s %lld 0%d%d%d %d/%d/%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,year,month,day,argv[1]);
+			if(day<10)
+			{
+				printf("%25s %10lld 0%d%d%d %d/%d/0%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,year,month,day,cwd);
+			}
+			else
+			{
+				printf("%25s %10lld 0%d%d%d %d/%d/%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,year,month,day,cwd);
+			}
 	    }
 	}
 
