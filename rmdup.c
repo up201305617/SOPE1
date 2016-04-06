@@ -6,18 +6,22 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <string.h>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <limits.h>
 
-#define MAX_LENGTH 255;
-
-int main1(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
   DIR *dir;
+  int fd1;
   struct dirent *direntp;
-  struct stat stat_buf;
-  //int child_counter=0;
-  //pid_t pids[255];
-  int num_dir=0;
-  //int status;
+  struct stat stat_buf_1;
+  int child_counter=0;
+  pid_t pids[128];
+
+  char *filename = "files_aux.txt";
+
   if (argc != 2)
   {
     fprintf(stderr, "Usage: %s <dir name>\n", argv[0]);
@@ -30,32 +34,58 @@ int main1(int argc, char* argv[])
     exit(2);
   }
 
-  chdir(argv[1]);
+  if ((fd1 = open(filename, O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0600)) == -1)
+  {
+	perror(filename);
+	exit(3);
+  }
+
+  char cwd[PATH_MAX + 1];
+  if (getcwd(cwd, PATH_MAX + 1) == NULL)
+  {
+	  perror("getcwd");
+	  exit(2);
+  }
+
+  char path[PATH_MAX + 1];
+  snprintf(path, PATH_MAX + 1, "%s/lstdir", cwd);
+  printf("%s\n",path);
+
+  if (chdir(argv[1]) != 0)
+  {
+      perror("chdir");
+      exit(3);
+  }
 
   while ((direntp = readdir(dir)) != NULL)
   {
-     if (lstat(direntp->d_name, &stat_buf)==-1)
+	 if (lstat(direntp->d_name, &stat_buf_1)==-1)
      {
-        perror("lstat");
-        exit(3);
+        perror("lstat1");
+        exit(4);
      }
      //verifica se é um directório e se não é o directório corrente(.) ou o pai do directório corrente(..)
-     if(S_ISDIR(stat_buf.st_mode) && strcmp(direntp->d_name,".")!=0 && strcmp(direntp->d_name,"..")!=0)
+     if(S_ISDIR(stat_buf_1.st_mode) && strcmp(direntp->d_name,".")!=0 && strcmp(direntp->d_name,"..")!=0)
      {
-        //pid_t pid=fork();
-    	 // pids[child_counter]=pid;
-       // if(pid==0)
-       // /{
-          num_dir++;
-          printf("%s\n",direntp->d_name);
-        //}
-        //child_counter++;
+    	pid_t pid=fork();
+        if(pid==0)
+        {
+        	chdir(direntp->d_name);
+        	execl(path,"lstdir",fd1,NULL);
+        	exit(5);
+        }
+        child_counter++;
+        pids[child_counter]=pid;
      }
 
   }
-  //int k;
-  //for(k=0;k<child_counter;k++)
-  //{  waitpid(pids[k],&status,0);}
-  printf("Número dir= %d\n",num_dir);
+
+  int k;
+
+  for(k=0;k<child_counter;k++)
+  {
+	  waitpid(pids[k],NULL,0);
+  }
+
   return 0;
 }

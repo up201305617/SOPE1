@@ -7,6 +7,8 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <string.h>
 
 int main(int argc, char* argv[])
 {
@@ -17,29 +19,28 @@ int main(int argc, char* argv[])
 	struct dirent *direntp;
 	struct stat stat_buf;
 	DIR *dir;
-	char *filename = "files_aux.txt";
+	char str[20];
+	strcpy(str, argv[1]);
+	fd1 = atoi(str);
+	char* cwd;
+	char buff[PATH_MAX + 1];
+	cwd = getcwd( buff, PATH_MAX + 1 );
+
+	printf("Hello\n");
 
 	if(argc!=2)
 	{
-		fprintf(stderr, "Usage: %s <dir name>\n", argv[0]);
+		fprintf(stderr, "Usage: %s <file descriptor>\n", argv[0]);
 		exit(1);
 	}
 
-	if ((dir = opendir(argv[1])) == NULL)
+	if ((dir = opendir(cwd)) == NULL)
 	{
 	    perror(argv[1]);
 	    exit(2);
 	}
-
-	if ((fd1 = open(filename, O_WRONLY|O_CREAT|O_EXCL|O_SYNC, 0600)) == -1)
-	{
-	    perror(filename);
-	    exit(3);
-	}
-
+	printf("ENTROU\n");
 	dup2(fd1, STDOUT_FILENO);
-
-	chdir(argv[1]);
 
 	while ((direntp = readdir(dir)) != NULL)
 	{
@@ -50,7 +51,7 @@ int main(int argc, char* argv[])
 		if (lstat(direntp->d_name, &stat_buf)==-1)
 	    {
 	       perror("lstat");
-	       exit(4);
+	       exit(3);
 	    }
 
 	    if(S_ISREG(stat_buf.st_mode))
@@ -94,7 +95,13 @@ int main(int argc, char* argv[])
 			{
 				other+=1;
 			}
-	    	printf("%s %lld 0%d%d%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,argv[1]);
+			//last modification date
+			struct tm * aux = localtime(&stat_buf.st_mtim.tv_sec);
+			int day=aux->tm_mday;
+			int month=aux->tm_mon+1;
+			int year=aux->tm_year+1900;
+
+			printf("%s %lld 0%d%d%d %d/%d/%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,year,month,day,argv[1]);
 	    }
 	}
 
