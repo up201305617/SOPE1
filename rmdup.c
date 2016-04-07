@@ -11,6 +11,10 @@
 #include <time.h>
 #include <limits.h>
 
+//booleanos
+#define FALSE 0
+#define TRUE 1
+
 int main(int argc, char* argv[])
 {
   DIR *dir;
@@ -39,8 +43,8 @@ int main(int argc, char* argv[])
 
   if ((fd1 = open(filename, O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0600)) == -1)
   {
-	perror(filename);
-	exit(3);
+	  perror(filename);
+	  exit(3);
   }
 
   if((fd2=open(filename1,O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0600)) == -1)
@@ -64,13 +68,13 @@ int main(int argc, char* argv[])
 
   if (chdir(argv[1]) != 0)
   {
-      perror("chdir");
-      exit(3);
+    perror("chdir");
+    exit(3);
   }
 
   while ((direntp = readdir(dir)) != NULL)
   {
-	 if (lstat(direntp->d_name, &stat_buf_1)==-1)
+	   if (lstat(direntp->d_name, &stat_buf_1)==-1)
      {
         perror("lstat1");
         exit(4);
@@ -78,31 +82,32 @@ int main(int argc, char* argv[])
      //verifica se é um directório e se não é o directório corrente(.) ou o pai do directório corrente(..)
      if(S_ISDIR(stat_buf_1.st_mode) && strcmp(direntp->d_name,".")!=0 && strcmp(direntp->d_name,"..")!=0)
      {
-    	pid_t pid=fork();
+      	pid_t pid=fork();
 
-    	if (pid == -1)
-    	{
-    		 printf ("Error on fork().\n");
-    	}
+        if (pid == -1)
+      	{
+      		printf ("Error on fork().\n");
+      	}
 
-    	if(pid==0)
+    	  if(pid==0)
         {
         	chdir(direntp->d_name);
         	execl(path,"lstdir",str,NULL);
         	exit(5);
         }
+
         child_counter++;
         pids[child_counter]=pid;
      }
-
   }
 
   int k;
 
   for(k=0;k<child_counter;k++)
   {
-	  waitpid(pids[k],NULL,0);
+	   waitpid(pids[k],NULL,0);
   }
+
   dup2(fd2, STDOUT_FILENO);
 
   pid_t pid1 = fork();
@@ -110,13 +115,14 @@ int main(int argc, char* argv[])
 
   if (pid1 == -1)
   {
-       printf ("Error on fork().\n");
+    printf ("Error on fork().\n");
   }
   if(pid1==0)
   {
 	  execlp ("sort", "sort", filename, NULL);
 	  perror("execlp");
   }
+  sleep(10);
   if(pid1>0)
   {
 	  pid_t pid0 = wait(&stat);
@@ -130,12 +136,17 @@ int main(int argc, char* argv[])
   close(fd2);
   closedir(dir);
 
+  //remove ficheiro temporário files_aux.txt
   rem_status=remove(filename);
 
   if (rem_status == 0)
-      printf ("\nFile %s removed.\n",filename);
+  {
+    printf ("\nFile %s removed.\n",filename);
+  }
   else
-      printf ("\nFile %s not removed.\n",filename);
+  {
+    printf ("\nFile %s not removed.\n",filename);
+  }
 
   return 0;
 }
