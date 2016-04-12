@@ -15,6 +15,94 @@
 #define FALSE 0
 #define TRUE 1
 
+struct info
+{
+	char name[100];
+	char permissions [100];
+	char date [100];
+	char path [100]; //path=name+directory
+};
+//para serem iguais têm que:
+//- ser ficheiros regulares;
+//- ter o mesmo nome;
+//- ter as mesmas permissões;
+//- ter o mesmo conteúdo
+int are_equals(struct info i1, struct info i2)
+{
+	if(strcmp(i1.name,i2.name)==FALSE && strcmp(i1.permissions,i2.permissions)==FALSE)
+	{
+		if(are_same_content(i1.path,i2.path)==TRUE)
+		{
+			unlink(i2.path);
+			link(i1.path, i2.path);
+		}
+	}
+}
+
+void fill_struct_info(struct info i1, char string [])
+{
+	printf("Entrou");
+	char * pch;
+	pch = strtok(string, " ");
+
+	strcpy(i1.name, pch);
+	pch = strtok(NULL, " ");
+
+	strcpy(i1.permissions, pch);
+	pch = strtok(NULL, " ");
+	strcpy(i1.date, pch);
+	printf("%s\n",i1.permissions);
+	printf("%s\n",i1.name);
+	printf("%s\n",i1.date);
+}
+
+int are_same_content(char path1 [], char path2[])
+{
+	FILE *fp1;
+	FILE *fp2;
+
+	char ch1;
+	char ch2;
+
+	fp1 = fopen(path1, "r");
+	fp2 = fopen(path2, "r");
+
+	if (fp1 == NULL)
+	{
+		printf("Cannot open %s for reading ", path1);
+		exit(1);
+	}
+	if (fp2 == NULL)
+	{
+	    printf("Cannot open %s for reading ", path2);
+	    exit(1);
+	}
+    ch1 = fgetc(fp1);
+    ch2 = fgetc(fp2);
+
+	while ((ch1 != EOF) && (ch2 != EOF) && (ch1 == ch2))
+	{
+		ch1 = fgetc(fp1);
+		ch2 = fgetc(fp2);
+	}
+
+    fclose(fp1);
+  	fclose(fp2);
+
+    if (ch1 == ch2)
+    {
+    	printf("Files are identical. \n");
+    	return TRUE;
+    }
+
+    if (ch1 != ch2)
+    {
+    	printf("Files are Not identical. \n");
+    	return FALSE;
+    }
+    return FALSE;
+}
+
 int main(int argc, char* argv[])
 {
   DIR *dir;
@@ -28,6 +116,8 @@ int main(int argc, char* argv[])
   char *filename = "/tmp/files_aux.txt";
   char *filename1 = "/tmp/files.txt";
   int saved_stdout = dup(STDOUT_FILENO);
+  struct info i1;
+  are_same_content("1.txt","2.txt");
 
   if (argc != 2)
   {

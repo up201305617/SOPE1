@@ -32,8 +32,8 @@ int main(int argc, char* argv[])
 
 	if(argc!=2)
 	{
-			fprintf(stderr, "Usage: %s <file descriptor>\n", argv[0]);
-			exit(1);
+		fprintf(stderr, "Usage: %s <file descriptor>\n", argv[0]);
+		exit(1);
 	}
 
 	if ((dir = opendir(cwd)) == NULL)
@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 		group=0;
 		other=0;
 
-			if (lstat(direntp->d_name, &stat_buf)==-1)
+		if (lstat(direntp->d_name, &stat_buf)==-1)
 	    {
 	       perror("lstat");
 	       exit(3);
@@ -73,43 +73,43 @@ int main(int argc, char* argv[])
 	    	}
 	    	//group
 	    	if(stat_buf.st_mode & S_IRGRP)
-				{
+			{
 	    		group+=4;
-				}
-				if(stat_buf.st_mode & S_IWGRP)
-				{
-					group+=2;
-				}
-				if(stat_buf.st_mode & S_IXGRP)
-				{
-					group+=1;
-				}
-				//others
-				if(stat_buf.st_mode & S_IROTH)
-				{
-					other+=4;
-				}
-				if(stat_buf.st_mode & S_IWOTH)
-				{
-					other+=2;
-				}
-				if(stat_buf.st_mode & S_IXOTH)
-				{
-					other+=1;
-				}
-				//last modification date
-				struct tm * aux = localtime(&stat_buf.st_mtim.tv_sec);
-				int day=aux->tm_mday;
-				int month=aux->tm_mon+1;
-				int year=aux->tm_year+1900;
-				if(day<10)
-				{
-					printf("%25s %10lld 0%d%d%d %d/%d/0%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,year,month,day,cwd);
-				}
-				else
-				{
-					printf("%25s %10lld 0%d%d%d %d/%d/%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,year,month,day,cwd);
-				}
+			}
+			if(stat_buf.st_mode & S_IWGRP)
+			{
+				group+=2;
+			}
+			if(stat_buf.st_mode & S_IXGRP)
+			{
+				group+=1;
+			}
+			//others
+			if(stat_buf.st_mode & S_IROTH)
+			{
+				other+=4;
+			}
+			if(stat_buf.st_mode & S_IWOTH)
+			{
+				other+=2;
+			}
+			if(stat_buf.st_mode & S_IXOTH)
+			{
+				other+=1;
+			}
+			//last modification date
+			struct tm * aux = localtime(&stat_buf.st_mtim.tv_sec);
+			int day=aux->tm_mday;
+			int month=aux->tm_mon+1;
+			int year=aux->tm_year+1900;
+			if(day<10)
+			{
+				printf("%25s %10lld 0%d%d%d %d/%d/0%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,year,month,day,cwd);
+			}
+			else
+			{
+				printf("%25s %10lld 0%d%d%d %d/%d/%d %s\n",direntp->d_name,(long long) stat_buf.st_size,owner,group,other,year,month,day,cwd);
+			}
 	    }
 	}
 	return 0;
