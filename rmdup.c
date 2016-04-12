@@ -20,7 +20,8 @@ struct info
 	char name[100];
 	char permissions [100];
 	char date [100];
-	char path [100]; //path=name+directory
+	char dir [100];
+	char path [100]; //path=directory + / + name
 };
 //para serem iguais têm que:
 //- ser ficheiros regulares;
@@ -39,8 +40,9 @@ int are_equals(struct info i1, struct info i2)
 	}
 }
 
-void fill_struct_info(struct info i1, char string [])
+/*struct info fill_struct_info(char string [])
 {
+	struct info i1;
 	printf("Entrou");
 	char * pch;
 	pch = strtok(string, " ");
@@ -54,7 +56,9 @@ void fill_struct_info(struct info i1, char string [])
 	printf("%s\n",i1.permissions);
 	printf("%s\n",i1.name);
 	printf("%s\n",i1.date);
-}
+
+	return i1;
+}*/
 
 int are_same_content(char path1 [], char path2[])
 {
@@ -116,7 +120,7 @@ int main(int argc, char* argv[])
   char *filename = "/tmp/files_aux.txt";
   char *filename1 = "/tmp/files.txt";
   int saved_stdout = dup(STDOUT_FILENO);
-  struct info i1;
+
   are_same_content("1.txt","2.txt");
 
   if (argc != 2)
@@ -164,7 +168,7 @@ int main(int argc, char* argv[])
 
   while ((direntp = readdir(dir)) != NULL)
   {
-	   if (lstat(direntp->d_name, &stat_buf_1)==-1)
+	 if (lstat(direntp->d_name, &stat_buf_1)==-1)
      {
         perror("lstat1");
         exit(4);
@@ -179,7 +183,7 @@ int main(int argc, char* argv[])
       		printf ("Error on fork().\n");
       	}
 
-    	  if(pid==0)
+    	if(pid==0)
         {
         	chdir(direntp->d_name);
         	execl(path,"lstdir",str,NULL);
@@ -212,7 +216,8 @@ int main(int argc, char* argv[])
 	  execlp ("sort", "sort", filename, NULL);
 	  perror("execlp");
   }
-  sleep(10);
+  dup2(saved_stdout, STDOUT_FILENO);
+  //sleep(10);
   if(pid1>0)
   {
 	  pid_t pid0 = wait(&stat);
@@ -220,9 +225,6 @@ int main(int argc, char* argv[])
   }
 
   close(fd1);
-
-  dup2(saved_stdout, STDOUT_FILENO);
-
   close(fd2);
   closedir(dir);
 
@@ -237,6 +239,17 @@ int main(int argc, char* argv[])
   {
     printf ("\nFile %s not removed.\n",filename);
   }
+  int fd3;
+  if((fd3=open(filename1,O_RDONLY, 0600)) == -1)
+  {
+	  perror(filename1);
+	  exit(4);
+  }
+
+  /*for()
+  {
+	  for()
+  }*/
 
   return 0;
 }

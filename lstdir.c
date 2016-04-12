@@ -10,10 +10,6 @@
 #include <limits.h>
 #include <string.h>
 
-//booleanos
-#define FALSE 0
-#define TRUE 1
-
 int main(int argc, char* argv[])
 {
 	int fd1;
@@ -55,7 +51,7 @@ int main(int argc, char* argv[])
 	       perror("lstat");
 	       exit(3);
 	    }
-
+		//permissions
 	    if(S_ISREG(stat_buf.st_mode))
 	    {
 	    	//ownwer
@@ -114,17 +110,3 @@ int main(int argc, char* argv[])
 	}
 	return 0;
 }
-/*
- 	printf( (fileStat.st_mode & S_IRUSR) ? "r" : "-");
-    printf( (fileStat.st_mode & S_IWUSR) ? "w" : "-");
-    printf( (fileStat.st_mode & S_IXUSR) ? "x" : "-");
-
-    printf( (fileStat.st_mode & S_IRGRP) ? "r" : "-");
-    printf( (fileStat.st_mode & S_IRGRP) ? "w" : "-");
-    printf( (fileStat.st_mode & S_IXGRP) ? "x" : "-");
-
-    printf( (fileStat.st_mode & S_IROTH) ? "r" : "-");
-    printf( (fileStat.st_mode & S_IWOTH) ? "w" : "-");
-    printf( (fileStat.st_mode & S_IXOTH) ? "x" : "-");
-
- */
