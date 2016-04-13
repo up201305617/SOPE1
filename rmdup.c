@@ -109,30 +109,17 @@ int are_same_content(char path1 [], char path2[])
 
 int main(int argc, char* argv[])
 {
-  DIR *dir;
   int fd1; //ficheiro temporário com a lista de files desordenada
   int fd2; //ficheiro final com a lista de files ordenada
-  struct dirent *direntp;
-  struct stat stat_buf_1;
-  int child_counter=0;
-  pid_t pids[128];
   int rem_status;
   char *filename = "/tmp/files_aux.txt";
   char *filename1 = "/tmp/files.txt";
   int saved_stdout = dup(STDOUT_FILENO);
 
-  are_same_content("1.txt","2.txt");
-
   if (argc != 2)
   {
     fprintf(stderr, "Usage: %s <dir name>\n", argv[0]);
     exit(1);
-  }
-
-  if ((dir = opendir(argv[1])) == NULL)
-  {
-    perror(argv[1]);
-    exit(2);
   }
 
   if ((fd1 = open(filename, O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0600)) == -1)
@@ -160,47 +147,22 @@ int main(int argc, char* argv[])
   char path[PATH_MAX + 1];
   snprintf(path, PATH_MAX + 1, "%s/lstdir", cwd);
 
-  if (chdir(argv[1]) != 0)
+  pid_t pid=fork();
+  if (pid == -1)
   {
-    perror("chdir");
-    exit(3);
+      printf ("Error on fork().\n");
+  }
+  if(pid==0)
+  {
+      execlp (path, "lstdir", str,path,argv[1], NULL);
+	  perror("execlp");
+  }
+  if(pid>0)
+  {
+	  int status;
+	  wait(&status);
   }
 
-  while ((direntp = readdir(dir)) != NULL)
-  {
-	 if (lstat(direntp->d_name, &stat_buf_1)==-1)
-     {
-        perror("lstat1");
-        exit(4);
-     }
-     //verifica se é um directório e se não é o directório corrente(.) ou o pai do directório corrente(..)
-     if(S_ISDIR(stat_buf_1.st_mode) && strcmp(direntp->d_name,".")!=0 && strcmp(direntp->d_name,"..")!=0)
-     {
-      	pid_t pid=fork();
-
-        if (pid == -1)
-      	{
-      		printf ("Error on fork().\n");
-      	}
-
-    	if(pid==0)
-        {
-        	chdir(direntp->d_name);
-        	execl(path,"lstdir",str,NULL);
-        	exit(5);
-        }
-
-        child_counter++;
-        pids[child_counter]=pid;
-     }
-  }
-
-  int k;
-
-  for(k=0;k<child_counter;k++)
-  {
-	   waitpid(pids[k],NULL,0);
-  }
 
   dup2(fd2, STDOUT_FILENO);
 
@@ -217,7 +179,7 @@ int main(int argc, char* argv[])
 	  perror("execlp");
   }
   dup2(saved_stdout, STDOUT_FILENO);
-  //sleep(10);
+  sleep(5);
   if(pid1>0)
   {
 	  pid_t pid0 = wait(&stat);
@@ -226,7 +188,6 @@ int main(int argc, char* argv[])
 
   close(fd1);
   close(fd2);
-  closedir(dir);
 
   //remove ficheiro temporário files_aux.txt
   rem_status=remove(filename);
