@@ -18,10 +18,10 @@
 struct info
 {
 	char name[100];
+	char size[100];
 	char permissions [100];
 	char date [100];
-	char dir [100];
-	char path [100]; //path=directory + / + name
+	char path [100];
 };
 //para serem iguais têm que:
 //- ser ficheiros regulares;
@@ -40,25 +40,21 @@ int are_equals(struct info i1, struct info i2)
 	}
 }
 
-/*struct info fill_struct_info(char string [])
+struct info fill_struct_info(char str[])
 {
 	struct info i1;
-	printf("Entrou");
-	char * pch;
-	pch = strtok(string, " ");
-
-	strcpy(i1.name, pch);
-	pch = strtok(NULL, " ");
-
-	strcpy(i1.permissions, pch);
-	pch = strtok(NULL, " ");
-	strcpy(i1.date, pch);
-	printf("%s\n",i1.permissions);
-	printf("%s\n",i1.name);
-	printf("%s\n",i1.date);
-
+	char * name=strtok(str," ");
+	char * size=strtok(NULL," ");
+	char * permissions=strtok(NULL," ");
+	char * date=strtok(NULL," ");
+	char * path=strtok(NULL," ");
+	strcpy(i1.name,name);
+	strcpy(i1.size,size);
+	strcpy(i1.permissions,permissions);
+	strcpy(i1.date,date);
+	strcpy(i1.path,path);
 	return i1;
-}*/
+}
 
 int are_same_content(char path1 [], char path2[])
 {
@@ -161,8 +157,8 @@ int main(int argc, char* argv[])
   {
 	  int status;
 	  wait(&status);
+	  printf("lstdir just finished.\n");
   }
-
 
   dup2(fd2, STDOUT_FILENO);
 
@@ -182,8 +178,8 @@ int main(int argc, char* argv[])
   sleep(5);
   if(pid1>0)
   {
-	  pid_t pid0 = wait(&stat);
-	  printf ("My son (%d) just finished.\n", pid0);
+	  wait(&stat);
+	  printf ("sort just finished.\n");
   }
 
   close(fd1);
@@ -194,23 +190,21 @@ int main(int argc, char* argv[])
 
   if (rem_status == 0)
   {
-    printf ("\nFile %s removed.\n",filename);
+    printf ("File %s removed.\n",filename);
   }
   else
   {
-    printf ("\nFile %s not removed.\n",filename);
+    printf ("File %s not removed.\n",filename);
   }
-  int fd3;
-  if((fd3=open(filename1,O_RDONLY, 0600)) == -1)
-  {
-	  perror(filename1);
-	  exit(4);
-  }
-
-  /*for()
-  {
-	  for()
-  }*/
-
+  char tg [100] = "         file.txt 123 0600 12/122/12 e/y/yyyy";
+  struct info i;
+  i=fill_struct_info(tg);
+  printf("%s\n",i.name);
+  printf("%s\n",i.size);
+  printf("%s\n",i.permissions);
+  printf("%s\n",i.date);
+  printf("%s\n",i.path);
   return 0;
 }
+
+
