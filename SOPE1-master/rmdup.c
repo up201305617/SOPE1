@@ -99,8 +99,8 @@ int are_equals(struct info i1, struct info i2)
 	{
 		if(are_same_content(i1.path,i2.path)==TRUE)
 		{
-			//unlink(i2.path);
-			//link(i1.path, i2.path);
+			unlink(i2.path);
+			link(i1.path, i2.path);
 			
 			return TRUE;
 		}
@@ -145,6 +145,7 @@ int delete_duplicates(struct info buf[], int len){
 	
 	for (i = 0; i < len; i++){
 		unlink(buf[i].path);
+		//link()
 	}
 	
 	return 0;
@@ -251,6 +252,8 @@ int main(int argc, char* argv[])
 		perror(filename);
 		exit(3);
 	}
+	
+	unlink(filename1);
 
 	if((fd2=open(filename1,O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0600)) == -1)
 	{
@@ -327,7 +330,7 @@ int main(int argc, char* argv[])
 	}
 	
 	
-	struct info delete[512];
+	int delete[512], deleted = FALSE;
 	int del_ctr = 0;
 	int file_nr = 0;
 	
@@ -347,22 +350,22 @@ int main(int argc, char* argv[])
 			i2 = *infptr;
 			
 			printf("i1:%s - i2:%s\n", i1.name, i2.name);
-/*			
+			
 			for (k = 0; k < del_ctr; k++){
-				if (delete[k] == j){
+				if (delete[k] == j || delete[k] == i){
 					deleted = TRUE;
 					break;
 				}
 				deleted = FALSE;
 			}
-*/			
-			//if (deleted == FALSE){
+			
+			if (deleted == FALSE){
 				if (are_equals(i1, i2) == TRUE){
 					printf("Deleted\n");
-					delete[del_ctr] = *infptr;
+					delete[del_ctr] = j;
 					del_ctr++;
 				}
-			//}
+			}
 		}
 		printf(".............................................................\n");	
 		
@@ -374,7 +377,7 @@ int main(int argc, char* argv[])
 	for (k = 0; k < (file_nr-1); k++){//reposiciona apontador no inicio
 		infptr--;
 	}
-	delete_duplicates(delete, del_ctr);
+	//delete_duplicates(delete, del_ctr);
 	
 	return 0;
 }
