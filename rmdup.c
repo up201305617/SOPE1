@@ -247,15 +247,15 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
-	if ((fd1 = open(filename, O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0600)) == -1)
+	if ((fd1 = open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND | O_SYNC, 0600)) == -1)
 	{
 		perror(filename);
 		exit(3);
 	}
 	
-	unlink(filename1);
+	//unlink(filename1);//O_TRUNC em vez de unlink
 
-	if((fd2=open(filename1,O_WRONLY|O_CREAT|O_APPEND|O_SYNC, 0600)) == -1)
+	if((fd2=open(filename1, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND | O_SYNC, 0600)) == -1)
 	{
 		perror(filename1);
 		exit(4);
@@ -387,9 +387,9 @@ int main(int argc, char* argv[])
 	
 	printf("%s\n", hlinks_path_name);
 	
-	unlink(hlinks_path_name);
+	//unlink(hlinks_path_name);//O_TRUNC em vex de unlink
 	
-	if((hlinks=open(hlinks_path_name, O_WRONLY|O_CREAT|O_APPEND, 0600)) == -1)
+	if((hlinks=open(hlinks_path_name, O_WRONLY | O_CREAT | O_TRUNC | O_APPEND | O_SYNC, 0600)) == -1)
 	{
 		perror(filename1);
 		exit(4);
